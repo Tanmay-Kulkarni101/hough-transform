@@ -1,4 +1,3 @@
-from scipy import ndimage
 import numpy as np
 from PIL import Image, ImageDraw
 import pdb
@@ -12,28 +11,45 @@ def preprocess(image):
     image = image.resize((height, width),Image.ANTIALIAS)
     return image
 
-def sobelFilter(image):
-    return ndimage.sobel(image)
+def gaussianFilter(image):
+    return cv2.GaussianBlur(image, ksize = (11,11), sigmaX=1.5)
 
-def selectTop(accumulator, top = 100):
+def sobelFilter(image):
+    sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0,ksize=3)
+    sobel_y = cv2.Sobel(image,cv2.CV_64F,0,1,ksize=3)
+    return np.sqrt(np.multiply(sobel_x, sobel_x) + np.multiply(sobel_y, sobel_y))
+
+def rhoToRow(rho_predicted, rho_delta, rho_max):
+    offset = int((rho_predicted + np.abs(rho_max))/rho_delta)
+    return offset
+
+def rowToRho(row, rho_delta, rho_max):
+    rho = -np.abs(rho_max) + row * rho_delta
+    return rho
+
+def selectTop(accumulator, top = 50):
     threshold = np.partition(accumulator.flatten(), -top)[-top]
 
     accumulator[accumulator < threshold] = 0
     return accumulator
 
-def draw_lines(image, accumulator, length = 10000):
+def draw_lines(image, accumulator, rho_max, rho_delta, length = 10000):
     # conver to PIL Image
     image = Image.fromarray(image)
     draw = ImageDraw.Draw(image)
     #draw.line((-1.5,0.5, 100.333, 100.5), fill=255, width = 3)
 
     indices = np.where(accumulator>0)
+    rhos = []
+    thetas = []
 
-    for i in range(len(indices)): 
+    for i in range(len(indices[0])): 
         # get x0 y0
-        rho = indices[0][i]
+        rho = rowToRho(indices[0][i], rho_delta, rho_max)
         theta = indices[1][i]
         theta = (theta * np.pi)/180
+        rhos.append(rhos)
+        thetas.append(theta)
 
         x0 = rho * np.cos(theta)
         y0 = rho * np.sin(theta)
@@ -48,8 +64,10 @@ def draw_lines(image, accumulator, length = 10000):
         x2 = int(x0 - dx * length)
         y2 = int(y0 - dy * length)
 
+        #pdb.set_trace()
+
         #draw line
-        draw.line((x1, y1, x2, y2), fill=255, width = 3)
+        draw.line((x1, y1, x2, y2), fill=255, width = 1)
 
     # vis_line_len = 1000 # len of line in pixels, big enough to span the image
     # vis_image_rgb = np.copy(image)
@@ -102,7 +120,3 @@ def non_max_suppression(image, window_size = 3):
 
     # getting rid of padding
     return result[padding:-padding,padding:-padding]
-
-def rhoToRow(rho_predicted, rho_delta, rho_max):
-    offset = int((rho_predicted + np.abs(rho_max))/rho_delta)
-    return offset

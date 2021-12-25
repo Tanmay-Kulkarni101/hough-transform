@@ -2,24 +2,31 @@ import numpy as np
 import hough_utils as utils
 import matplotlib.pyplot as plt
 from PIL import Image, ImageOps
+from tqdm import tqdm
 
 MAX_DEGREE = 180
 THETA_OFFSET = 0
 
-def hough(image, rho_delta = 1, theta_delta = 1, threshold = 255.0/2, debug = False):
+def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False):
     h,w = image.shape
     rho_max = np.linalg.norm(np.array([h,w]))
+
+    image = utils.gaussianFilter(image)
 
     filtered_image = utils.sobelFilter(image)
 
     indices = np.where(filtered_image > threshold)
+
+    im_sobel = 255.0 * (filtered_image > threshold)
+    sobel_out = Image.fromarray(im_sobel)
+    sobel_out.show()
     
     rows = 2 * int(rho_max/rho_delta)
     cols = int(MAX_DEGREE/theta_delta)
     
     accumulator = np.zeros((rows, cols))
 
-    for i in range(len(indices[0])):
+    for i in tqdm(range(len(indices[0]))):
         x = indices[0][i]
         y = indices[1][i]
 
@@ -50,10 +57,10 @@ def hough(image, rho_delta = 1, theta_delta = 1, threshold = 255.0/2, debug = Fa
         plt.colorbar()
         plt.show()
 
-    return accumulator
+    return accumulator, rho_max
 
 if __name__ == '__main__':
-    image = Image.open('./images/Unknown.jpeg') # get this from the upload
+    image = Image.open('./images/img10.jpg') # get this from the upload
     image = ImageOps.grayscale(image)
     #image.show()
     #image = utils.preprocess(image)
@@ -61,9 +68,10 @@ if __name__ == '__main__':
     image = np.asarray(image)
     #print(image)
     
-    accumulator = hough(image)
+    rho_delta = 1
+    accumulator, rho_max = hough(image, rho_delta=rho_delta)
     accumulator = utils.selectTop(accumulator)
 
-    image_with_lines = utils.draw_lines(image, accumulator)
+    image_with_lines = utils.draw_lines(image, accumulator, rho_max, rho_delta)
 
     utils.render_image(image_with_lines)
