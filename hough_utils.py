@@ -33,7 +33,7 @@ def selectTop(accumulator, top = 50):
     accumulator[accumulator < threshold] = 0
     return accumulator
 
-def draw_lines(image, accumulator, rho_max, rho_delta, length = 10000):
+def draw_inf_lines(image, accumulator, rho_max, rho_delta, length = 10000):
     # conver to PIL Image
     image = Image.fromarray(image)
     draw = ImageDraw.Draw(image)
@@ -66,6 +66,8 @@ def draw_lines(image, accumulator, rho_max, rho_delta, length = 10000):
         draw.line((x1, y1, x2, y2), fill=255, width = 1)
     
     return image
+
+
 
 def render_image(image):
     image.show()

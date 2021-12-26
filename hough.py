@@ -68,6 +68,6 @@ if __name__ == '__main__':
     accumulator, rho_max = hough(image, rho_delta=rho_delta)
     accumulator = utils.selectTop(accumulator)
 
-    image_with_lines = utils.draw_lines(image, accumulator, rho_max, rho_delta)
+    image_with_lines = utils.draw_inf_lines(image, accumulator, rho_max, rho_delta)
 
     utils.render_image(image_with_lines)
