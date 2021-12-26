@@ -16,10 +16,6 @@ def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False
     filtered_image = utils.sobelFilter(image)
 
     indices = np.where(filtered_image > threshold)
-
-    im_sobel = 255.0 * (filtered_image > threshold)
-    sobel_out = Image.fromarray(im_sobel)
-    sobel_out.show()
     
     rows = 2 * int(rho_max/rho_delta)
     cols = int(MAX_DEGREE/theta_delta)
@@ -63,7 +59,7 @@ if __name__ == '__main__':
     image = Image.open('./images/img10.jpg') # get this from the upload
     image = ImageOps.grayscale(image)
     #image.show()
-    #image = utils.preprocess(image)
+    image = utils.preprocess(image)
 
     image = np.asarray(image)
     #print(image)

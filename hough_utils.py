@@ -6,9 +6,9 @@ import cv2
 def preprocess(image):
     h = image.height
     w = image.width
-    height = 180
+    height = 640
     width = int(w * (height/h))
-    image = image.resize((height, width),Image.ANTIALIAS)
+    image = image.resize((width, height), Image.ANTIALIAS)
     return image
 
 def gaussianFilter(image):
@@ -40,16 +40,12 @@ def draw_lines(image, accumulator, rho_max, rho_delta, length = 10000):
     #draw.line((-1.5,0.5, 100.333, 100.5), fill=255, width = 3)
 
     indices = np.where(accumulator>0)
-    rhos = []
-    thetas = []
 
     for i in range(len(indices[0])): 
         # get x0 y0
         rho = rowToRho(indices[0][i], rho_delta, rho_max)
         theta = indices[1][i]
         theta = (theta * np.pi)/180
-        rhos.append(rhos)
-        thetas.append(theta)
 
         x0 = rho * np.cos(theta)
         y0 = rho * np.sin(theta)
@@ -68,20 +64,8 @@ def draw_lines(image, accumulator, rho_max, rho_delta, length = 10000):
 
         #draw line
         draw.line((x1, y1, x2, y2), fill=255, width = 1)
-
-    # vis_line_len = 1000 # len of line in pixels, big enough to span the image
-    # vis_image_rgb = np.copy(image)
-    # indices = np.where(accumulator>0)
-    # pdb.set_trace()
-    # for rho, theta in indices:
-    #     x0 = rho*np.cos(theta); y0 = rho*np.sin(theta)
-    #     x1 = int(x0 - vis_line_len*np.sin(theta)); y1 = int(y0 + vis_line_len*np.cos(theta))
-    #     x2 = int(x0 + vis_line_len*np.sin(theta)); y2 = int(y0 - vis_line_len*np.cos(theta)); 
-    #     cv2.line(vis_image_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)
     
     return image
-
-
 
 def render_image(image):
     image.show()
