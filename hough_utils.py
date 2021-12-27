@@ -1,5 +1,6 @@
-import numpy as np
 from PIL import Image, ImageDraw
+from tqdm import tqdm
+import numpy as np
 import pdb
 import cv2
 
@@ -15,8 +16,8 @@ def gaussianFilter(image):
     return cv2.GaussianBlur(image, ksize = (11,11), sigmaX=1.5)
 
 def sobelFilter(image):
-    sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0,ksize=3)
-    sobel_y = cv2.Sobel(image,cv2.CV_64F,0,1,ksize=3)
+    sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0, ksize=3)
+    sobel_y = cv2.Sobel(image,cv2.CV_64F,0,1, ksize=3)
     return np.sqrt(np.multiply(sobel_x, sobel_x) + np.multiply(sobel_y, sobel_y))
 
 def rhoToRow(rho_predicted, rho_delta, rho_max):
@@ -34,7 +35,12 @@ def selectTop(accumulator, top = 50):
     return accumulator
 
 def draw_inf_lines(image, accumulator, rho_max, rho_delta, length = 10000):
-    # conver to PIL Image
+    '''
+    Draw lines of infinite length for edges in the images
+    
+    
+    '''
+    # convert to PIL Image
     image = Image.fromarray(image)
     draw = ImageDraw.Draw(image)
     #draw.line((-1.5,0.5, 100.333, 100.5), fill=255, width = 3)
@@ -60,14 +66,47 @@ def draw_inf_lines(image, accumulator, rho_max, rho_delta, length = 10000):
         x2 = int(x0 - dx * length)
         y2 = int(y0 - dy * length)
 
-        #pdb.set_trace()
-
         #draw line
         draw.line((x1, y1, x2, y2), fill=255, width = 1)
     
     return image
 
+def draw_finite_lines(image, accumulator, rho_max, rho_delta, voters, tolerence = 0.05, length = 5):
+    '''
+    '''
+    # convert to PIL Image
+    image = Image.fromarray(image)
+    draw = ImageDraw.Draw(image)
 
+    indices = np.where(accumulator>0)
+    num_voters = len(voters[0])
+
+    for voter_index in tqdm(range(num_voters)):
+        voter_y = voters[0][voter_index]
+        voter_x = voters[1][voter_index]
+
+        for i in range(len(indices[0])): 
+            rho = rowToRho(indices[0][i], rho_delta, rho_max)
+            theta = indices[1][i]
+            theta = (theta * np.pi)/180
+
+            rho_target = voter_x * np.cos(theta) + voter_y * np.sin(theta)
+            diff = rho - rho_target
+
+            if np.abs(diff) <= tolerence:
+                dx = - np.sin(theta)
+                dy = np.cos(theta)
+
+                x1 = int(voter_x + dx * length)
+                y1 = int(voter_y + dy * length)
+
+                x2 = int(voter_x - dx * length)
+                y2 = int(voter_y - dy * length)
+
+                #draw line
+                draw.line((x1, y1, x2, y2), fill="green", width = 1)
+    
+    return image
 
 def render_image(image):
     image.show()
