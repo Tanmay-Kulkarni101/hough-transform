@@ -23,13 +23,13 @@ def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False
     accumulator = np.zeros((rows, cols))
 
     for i in tqdm(range(len(indices[0]))):
-        x = indices[0][i]
-        y = indices[1][i]
+        y = indices[0][i]
+        x = indices[1][i]
 
         for col in range(cols):
             theta = (THETA_OFFSET + col * theta_delta * np.pi)/180
 
-            rho_predicted = y * np.cos(theta) + x * np.sin(theta)
+            rho_predicted = x * np.cos(theta) + y * np.sin(theta)
 
             if np.abs(rho_predicted) >= rho_max:
                 rho_predicted = (rho_predicted/np.abs(rho_predicted)) * rho_max
@@ -53,21 +53,23 @@ def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False
         plt.colorbar()
         plt.show()
 
-    return accumulator, rho_max
+    return accumulator, rho_max, indices
 
 if __name__ == '__main__':
-    image = Image.open('./images/img10.jpg') # get this from the upload
-    image = ImageOps.grayscale(image)
+    image = Image.open('./images/Unknown.jpeg') # get this from the upload
+    grey_scale_image = ImageOps.grayscale(image)
     #image.show()
-    image = utils.preprocess(image)
+    # image = utils.preprocess(image)
 
+    grey_scale_image = np.asarray(grey_scale_image)
     image = np.asarray(image)
     #print(image)
     
     rho_delta = 1
-    accumulator, rho_max = hough(image, rho_delta=rho_delta)
+    accumulator, rho_max, voters = hough(grey_scale_image, rho_delta=rho_delta)
     accumulator = utils.selectTop(accumulator)
 
-    image_with_lines = utils.draw_inf_lines(image, accumulator, rho_max, rho_delta)
+    image_with_lines = utils.draw_finite_lines(image, accumulator, rho_max, rho_delta, voters)
+    # image_with_lines = utils.draw_inf_lines(image, accumulator, rho_max, rho_delta)
 
     utils.render_image(image_with_lines)
