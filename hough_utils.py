@@ -34,6 +34,14 @@ def gaussianFilter(image):
     return cv2.GaussianBlur(image, ksize = DEFAULT_GAUSSIAN_KERNEL_SIZE, sigmaX=DEFAULT_GAUSSIAN_KERNEL_VARIANCE)
 
 def sobelFilter(image):
+    '''Finds gradients along the X and Y axis 
+    
+    Args: 
+        image (ndarray): An ndarray corresponding to the input image
+
+    Returns:
+        ndarray: An ndarray containing gradients corresponding to the X and Y axis.
+    '''
     # Grad Y
     sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0, ksize=3)
 
@@ -44,10 +52,29 @@ def sobelFilter(image):
     return np.sqrt(np.multiply(sobel_x, sobel_x) + np.multiply(sobel_y, sobel_y))
 
 def rhoToRow(rho_predicted, rho_delta, rho_max):
+    '''Convert rho (normal length) to the corresponding row of the accumulator
+    
+    Args:
+        rho_predicted (float): The normal length corresponding to the line
+        rho_delta (float): The change in rho with each row
+
+    Returns:
+        (int) The row corresponding to the input rho
+    '''
     offset = int((rho_predicted + np.abs(rho_max))/rho_delta)
     return offset
 
 def rowToRho(row, rho_delta, rho_max):
+    '''Convert the row in the acumulator array to the corresponding rho
+
+    Args:
+        row (int): Row in the accumulator array
+        rho_delta (float): Change in rho by changing a single row
+        rho_max (int): Maximum possible rho
+    
+    Returns:
+        (float): rho chorresponding to the input row
+    '''
     rho = -np.abs(rho_max) + row * rho_delta
     return rho
 
