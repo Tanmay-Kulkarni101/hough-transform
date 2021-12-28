@@ -5,6 +5,8 @@ import pdb
 import cv2
 
 DEFAULT_HEIGHT = 640
+DEFAULT_GAUSSIAN_KERNEL_SIZE = (11, 11)
+DEFAULT_GAUSSIAN_KERNEL_VARIANCE = 1.5
 
 def preprocess(image):
     h = image.height
@@ -18,7 +20,7 @@ def preprocess(image):
     return image
 
 def gaussianFilter(image):
-    return cv2.GaussianBlur(image, ksize = (11,11), sigmaX=1.5)
+    return cv2.GaussianBlur(image, ksize = DEFAULT_GAUSSIAN_KERNEL_SIZE, sigmaX=DEFAULT_GAUSSIAN_KERNEL_VARIANCE)
 
 def sobelFilter(image):
     sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0, ksize=3)
