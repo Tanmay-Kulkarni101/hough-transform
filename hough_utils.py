@@ -10,8 +10,11 @@ def preprocess(image):
     h = image.height
     w = image.width
     height = DEFAULT_HEIGHT
-    width = int(w * (height/h))
-    image = image.resize((width, height), Image.ANTIALIAS)
+    
+    # resize the image only if the height is greater than the default height
+    if h > height:
+        width = int(w * (height/h))
+        image = image.resize((width, height), Image.ANTIALIAS)
     return image
 
 def gaussianFilter(image):
