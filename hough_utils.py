@@ -181,6 +181,17 @@ def render_image(image):
     image.show()
 
 def isMax(image, x, y, window_size):
+    '''Finds out if the pixel in the middle of the window is the largets
+
+    Args:
+        image (ndarray): An ndarray representing the image
+        x (int): The x coordinate of the start of the window
+        y (int): The y coordinate of the start of the window
+        window_size (int): The size of the window in which we want to find max
+    
+    Returns:
+        True if the center pixel is greater than all the other pixels in the window
+    '''
     center_x = x + int(window_size/2)
     center_y = y + int(window_size/2)
 
@@ -198,6 +209,15 @@ def isMax(image, x, y, window_size):
     return center_x, center_y, True
 
 def non_max_suppression(image, window_size = 3):
+    '''Retain the local maxima of votes
+
+    Args:
+        image (ndarray): The image represented as an ndarray
+        window_size (int): The size of the window around which we want to find local maxima
+
+    Returns:
+        (ndarray): The image filtered for the local maxima
+    '''
     padding = int(window_size/2)
     padded_image = np.pad(image, pad_width = padding)
 
