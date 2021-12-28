@@ -4,10 +4,12 @@ import numpy as np
 import pdb
 import cv2
 
+DEFAULT_HEIGHT = 640
+
 def preprocess(image):
     h = image.height
     w = image.width
-    height = 640
+    height = DEFAULT_HEIGHT
     width = int(w * (height/h))
     image = image.resize((width, height), Image.ANTIALIAS)
     return image
