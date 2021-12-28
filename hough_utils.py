@@ -9,6 +9,17 @@ DEFAULT_GAUSSIAN_KERNEL_SIZE = (11, 11)
 DEFAULT_GAUSSIAN_KERNEL_VARIANCE = 1.5
 
 def preprocess(image):
+    '''Takes in a pillow image and resizes it to a fixed height preserving aspect ratio
+
+    Args:
+        image (Pillow image): An image that has to be preprocessed
+    
+    Returns:
+        Pillow image: A resized image
+    
+    NOTE:
+        It does not resize images smaller than the DEFAULT_HEIGHT
+    '''
     h = image.height
     w = image.width
     height = DEFAULT_HEIGHT
@@ -23,8 +34,13 @@ def gaussianFilter(image):
     return cv2.GaussianBlur(image, ksize = DEFAULT_GAUSSIAN_KERNEL_SIZE, sigmaX=DEFAULT_GAUSSIAN_KERNEL_VARIANCE)
 
 def sobelFilter(image):
+    # Grad Y
     sobel_x = cv2.Sobel(image,cv2.CV_64F,1,0, ksize=3)
+
+    # Grad X
     sobel_y = cv2.Sobel(image,cv2.CV_64F,0,1, ksize=3)
+
+    # Find the L2 of X Gradient and Y Gradient
     return np.sqrt(np.multiply(sobel_x, sobel_x) + np.multiply(sobel_y, sobel_y))
 
 def rhoToRow(rho_predicted, rho_delta, rho_max):
