@@ -85,10 +85,17 @@ def selectTop(accumulator, top = 50):
     return accumulator
 
 def draw_inf_lines(image, accumulator, rho_max, rho_delta, length = 10000):
-    '''
-    Draw lines of infinite length for edges in the images
+    '''Draw lines of infinite length for edges in the images
     
-    
+    Args:
+        image (ndarray): An image on which we want to draw lines
+        accumulator (ndarray): An array containing votes for lines
+        rho_max (float): The maximal possible normal distance
+        rho_delta (float): The change in rho by changing a single row
+        length (float): The length of the line to be drawn on the image
+
+    Returns:
+        An image with lines drawn corresponding to lines detected from the image
     '''
     # convert to PIL Image
     image = Image.fromarray(image)
@@ -122,7 +129,19 @@ def draw_inf_lines(image, accumulator, rho_max, rho_delta, length = 10000):
     return image
 
 def draw_finite_lines(image, accumulator, rho_max, rho_delta, voters, tolerence = 0.05, length = 5):
-    '''
+    '''Draw lines of finite length for edges in the images
+    
+    Args:
+        image (ndarray): An image on which we want to draw lines
+        accumulator (ndarray): An array containing votes for lines
+        rho_max (float): The maximal possible normal distance
+        rho_delta (float): The change in rho by changing a single row
+        voters (ndarray): An array containing the pixels that voted for an edge
+        tolerence (float): The amount of error we allow for rho_predicted
+        length (float): The length of the line to be drawn on the image
+
+    Returns:
+        An image with lines drawn corresponding to lines detected from the image
     '''
     # convert to PIL Image
     image = Image.fromarray(image)
