@@ -9,10 +9,12 @@ THETA_OFFSET = 0
 
 def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False):
     h,w = image.shape
+
+    # Largest possible normal distance is the diagonal length of the image
     rho_max = np.linalg.norm(np.array([h,w]))
 
+    # Obtain edges corresponding to the image
     image = utils.gaussianFilter(image)
-
     filtered_image = utils.sobelFilter(image)
 
     indices = np.where(filtered_image > threshold)
@@ -58,12 +60,10 @@ def hough(image, rho_delta = 1, theta_delta = 1, threshold = 30.0, debug = False
 if __name__ == '__main__':
     image = Image.open('./images/Unknown.jpeg') # get this from the upload
     grey_scale_image = ImageOps.grayscale(image)
-    #image.show()
-    # image = utils.preprocess(image)
+    image = utils.preprocess(image)
 
     grey_scale_image = np.asarray(grey_scale_image)
     image = np.asarray(image)
-    #print(image)
     
     rho_delta = 1
     accumulator, rho_max, voters = hough(grey_scale_image, rho_delta=rho_delta)
